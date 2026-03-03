@@ -12,6 +12,122 @@ interface LessonPlayerProps {
     onBack: () => void;
 }
 
+// Adapts the flat JSON structure from Google Docs to the nested structure expected by the UI
+function adaptLessonFormat(parsed: any): Lesson {
+    if (parsed.sections) return parsed; // Already in standard format
+
+    const items: any[] = [];
+    const type = parsed.exerciseType;
+    const content = parsed.content || {};
+
+    if (type === 'richtext') {
+        items.push({ id: 'item-1', type: 'rich_text', content: content.text || '' });
+    } else if (type === 'multiple_choice') {
+        const questions = content.questions || [];
+        questions.forEach((q: any, i: number) => {
+            items.push({
+                id: `q-${i}`,
+                type: 'multiple_choice',
+                prompt: q.question,
+                choices: (q.options || []).map((opt: string, j: number) => ({
+                    id: `opt-${j}`,
+                    text: opt,
+                    isCorrect: opt === q.correctAnswer
+                }))
+            });
+        });
+    } else if (type === 'fill_in_blank') {
+        const blanks = content.blanks || [];
+        blanks.forEach((b: any, i: number) => {
+            const text = b.sentence.replace('___', `[${b.correctAnswer}]`);
+            items.push({
+                id: `b-${i}`,
+                type: 'fill_blank',
+                prompt: `Fülle die Lücke aus: ${b.sentence.replace('___', '...')}`,
+                text: text,
+                solutions: { "0": b.correctAnswer }
+            });
+        });
+    } else if (type === 'dialog') {
+        const lines = (content.text || "").split('\n').map((line: string, i: number) => {
+            const split = line.split(':');
+            if (split.length > 1) {
+                return { id: `l-${i}`, speaker: split[0].trim(), text: split.slice(1).join(':').trim() };
+            }
+            return { id: `l-${i}`, speaker: '', text: line.trim() };
+        }).filter((l: any) => l.text);
+        items.push({ id: 'item-1', type: 'dialog', lines });
+    } else if (type === 'matching') {
+        items.push({ id: 'item-1', type: 'matching', pairs: content.pairs || [] });
+    } else if (type === 'word_order') {
+        const lines = (content.text || "").split('\n').filter(Boolean);
+        lines.forEach((line: string, i: number) => {
+            const cleanLine = line.replace(/^\d+\.\s*/, '');
+            const parts = cleanLine.split('–').map((p: string) => p.trim());
+            items.push({
+                id: `wo-${i}`,
+                type: 'reorder_sentence',
+                instruction: 'Bringen Sie die Wörter in die richtige Reihenfolge.',
+                prompt: parts.join(' / '),
+                solution: parts
+            });
+        });
+    } else if (type === 'roleplay') {
+        items.push({
+            id: 'item-1',
+            type: 'roleplay',
+            prompt: `${content.roleplayInstructions?.roleA || ''}\n${content.roleplayInstructions?.roleB || ''}`,
+            usefulPhrases: content.roleplayInstructions?.tasks || []
+        });
+    } else if (type === 'free_text') {
+        items.push({
+            id: 'item-1',
+            type: 'short_write',
+            prompt: "Schreibe einen kurzen Text:",
+            sampleSolution: content.template || ""
+        });
+    } else if (type === 'mini_test') {
+        const questions = content.questions || [];
+        questions.forEach((q: any, i: number) => {
+            items.push({
+                id: `mt-${i}`,
+                type: 'multiple_choice',
+                prompt: q.question,
+                choices: (q.options || []).map((opt: string, j: number) => ({
+                    id: `opt-${j}`,
+                    text: opt,
+                    isCorrect: opt === q.correctAnswer
+                }))
+            });
+        });
+    } else {
+        items.push({ id: 'item-1', type: 'rich_text', content: JSON.stringify(content, null, 2) });
+    }
+
+    const sectionTypeMap: any = {
+        'richtext': 'reading', 'multiple_choice': 'multiple_choice', 'fill_in_blank': 'fill_blank',
+        'dialog': 'dialog', 'matching': 'matching', 'word_order': 'reorder_sentence',
+        'roleplay': 'roleplay', 'free_text': 'short_write', 'mini_test': 'mini_test'
+    };
+
+    return {
+        id: parsed.id || `${parsed.moduleId}-L${String(parsed.lessonNumber || parsed.order || 1).padStart(2, '0')}`,
+        moduleId: parsed.moduleId || 'Unknown',
+        title: parsed.title || 'Lektion',
+        version: "1.0.0",
+        isPublished: true,
+        sections: [
+            {
+                id: 'sec-1',
+                type: sectionTypeMap[type] || 'reading',
+                title: parsed.title || 'Lektion',
+                instruction: parsed.instruction || '',
+                items
+            }
+        ]
+    };
+}
+
 export function LessonPlayer({ lessonId, onBack }: LessonPlayerProps) {
     const { t } = useTranslation();
     const user = AuthService.getCurrentUser();
@@ -28,13 +144,15 @@ export function LessonPlayer({ lessonId, onBack }: LessonPlayerProps) {
             try {
                 const data = await DB.getLesson(lessonId);
                 if (data) {
-                    setLesson(JSON.parse(data.content_json));
+                    let parsed = JSON.parse(data.content_json);
+                    parsed = adaptLessonFormat(parsed);
+                    setLesson(parsed);
                 } else {
                     // Fallback to legacy JSON if needed or show error
                     console.warn("Lesson not found in DB, checking legacy local files...");
                     const [module, id] = lessonId.split('-');
                     const moduleContent = await import(`../../content/${module}/${id}.json`);
-                    setLesson(moduleContent.default);
+                    setLesson(adaptLessonFormat(moduleContent.default));
                 }
             } catch (error) {
                 console.error("Failed to load lesson:", error);
