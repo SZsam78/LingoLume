@@ -1,20 +1,33 @@
+import { firestore } from './firebase';
+import { collection, doc, getDoc, getDocs, setDoc, query, where } from 'firebase/firestore';
+
 export class DB {
     static async query<T>(sql: string, params: any[] = []): Promise<T[]> {
+        // Handle Firestore queries for web
+        if (!window.electronAPI) {
+            if (sql.includes('SELECT * FROM lessons WHERE id = ?')) {
+                const lessonDoc = await getDoc(doc(firestore, 'lessons', params[0]));
+                if (lessonDoc.exists()) {
+                    const data = lessonDoc.data();
+                    return [{ id: lessonDoc.id, content_json: JSON.stringify(data) }] as any;
+                }
+            }
+            if (sql.includes('SELECT * FROM lessons WHERE moduleId = ?')) {
+                const q = query(collection(firestore, 'lessons'), where('moduleId', '==', params[0]));
+                const snapshot = await getDocs(q);
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any;
+            }
+        }
+
         if (window.electronAPI && window.electronAPI.dbQuery) {
             const result = await window.electronAPI.dbQuery(sql, params);
-            console.log('[DB.query]', sql, params, '->', result);
             return result;
         }
-        console.warn('[DB.query] No electronAPI! Falling back to mock. SQL:', sql);
-        // Fallback for browser (Local Storage)
+
+        // Final Browser Fallback (Local Storage)
         if (sql.includes('SELECT * FROM lessons')) {
             const id = params[0];
             const data = localStorage.getItem(`mock_db_lesson_${id}`);
-            return data ? [JSON.parse(data)] : [];
-        }
-        if (sql.includes('SELECT * FROM progress')) {
-            const id = params[0];
-            const data = localStorage.getItem(`mock_db_progress_${id}`);
             return data ? [JSON.parse(data)] : [];
         }
         return [];
@@ -24,66 +37,38 @@ export class DB {
         if (window.electronAPI && window.electronAPI.dbExecute) {
             return window.electronAPI.dbExecute(sql, params);
         }
-        console.warn('Electron API not found. Used Mock Execute:', sql, params);
-        // Fallback for browser (Local Storage)
-        if (sql.includes('UPDATE lessons') || sql.includes('INSERT INTO lessons')) {
-            // For UPDATE: [lesson.title, JSON.stringify(lesson), lesson.isPublished ? 1 : 0, updatedAt, lesson.id]
-            // For INSERT: [lesson.id, lesson.moduleId, lesson.title, JSON.stringify(lesson), 0, updatedAt]
-            const isInsert = sql.includes('INSERT');
-            const id = isInsert ? params[0] : params[4];
-            const contentIndex = isInsert ? 3 : 1;
-
-            try {
-                const lessonData = JSON.parse(params[contentIndex]);
-                // Store the row format that getLesson expects `{ content_json: string }`
-                localStorage.setItem(`mock_db_lesson_${id}`, JSON.stringify({
-                    id: lessonData.id,
-                    content_json: params[contentIndex]
-                }));
-            } catch (e) {
-                console.error("Mock DB parse error", e);
-            }
-        }
-        if (sql.includes('UPDATE progress') || sql.includes('INSERT INTO progress')) {
-            const isInsert = sql.includes('INSERT');
-            const itemId = isInsert ? params[1] : params[5];
-            localStorage.setItem(`mock_db_progress_${itemId}`, JSON.stringify({ itemId, status: params[2] }));
-        }
         return { changes: 1 };
     }
 
-    static async getProgress(itemId: string): Promise<any> {
-        const results = await this.query('SELECT * FROM progress WHERE itemId = ?', [itemId]);
-        return results[0] || null;
-    }
-
-    static async updateProgress(itemId: string, status: string, lastAnswer: any, lastResult: any) {
-        const updatedAt = new Date().toISOString();
-        const existing = await this.getProgress(itemId);
-
-        if (existing) {
-            return this.execute(
-                'UPDATE progress SET status = ?, attempts = attempts + 1, lastAnswer = ?, lastResult = ?, updatedAt = ? WHERE itemId = ?',
-                [status, JSON.stringify(lastAnswer), JSON.stringify(lastResult), updatedAt, itemId]
-            );
-        } else {
-            return this.execute(
-                'INSERT INTO progress (id, itemId, status, attempts, lastAnswer, lastResult, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [crypto.randomUUID(), itemId, status, 1, JSON.stringify(lastAnswer), JSON.stringify(lastResult), updatedAt]
-            );
-        }
-    }
-
-    // --- Authoring & Media ---
+    // --- Learning ---
 
     static async getLesson(lessonId: string): Promise<any> {
+        if (!window.electronAPI) {
+            const lessonDoc = await getDoc(doc(firestore, 'lessons', lessonId));
+            if (lessonDoc.exists()) {
+                const data = lessonDoc.data();
+                return {
+                    id: lessonId,
+                    ...data,
+                    content_json: data.content_json || JSON.stringify(data)
+                };
+            }
+        }
         const results = await this.query('SELECT * FROM lessons WHERE id = ?', [lessonId]);
         return results[0] || null;
     }
 
     static async saveLesson(lesson: any) {
-        const existing = await this.getLesson(lesson.id);
         const updatedAt = new Date().toISOString();
+        if (!window.electronAPI) {
+            await setDoc(doc(firestore, 'lessons', lesson.id), {
+                ...lesson,
+                updatedAt
+            });
+            return;
+        }
+
+        const existing = await this.getLesson(lesson.id);
         if (existing) {
             return this.execute(
                 'UPDATE lessons SET title = ?, content_json = ?, isPublished = ?, updatedAt = ? WHERE id = ?',
@@ -106,12 +91,12 @@ export class DB {
         const arrayBuffer = await file.arrayBuffer();
         const uint8Array = new Uint8Array(arrayBuffer);
 
-        const result = await window.electronAPI.saveMedia(fileName, uint8Array);
+        if (window.electronAPI) {
+            const result = await window.electronAPI.saveMedia(fileName, uint8Array);
+            return { id, fileName, path: result.path };
+        }
 
-        await this.execute(
-            'INSERT INTO media (id, originalName, fileName, mimeType, path, createdAt) VALUES (?, ?, ?, ?, ?, ?)',
-            [id, file.name, fileName, file.type, result.path, updatedAt]
-        );
-        return { id, fileName, path: result.path };
+        // No web media upload implemented yet, just return dummy/local info
+        return { id, fileName, path: URL.createObjectURL(file), updatedAt };
     }
 }
