@@ -1,0 +1,21 @@
+[
+    {
+        "id": "A1-TEST-L1",
+        "moduleId": "A1.1",
+        "title": "Test Lektion (Agent Upload Test)",
+        "description": "Dies ist eine Test-Lektion um den Upload-Prozess zu verifizieren.",
+        "tasks": [
+            {
+                "id": "T1",
+                "question": "Was ist die korrekte Begrüßung am Morgen?",
+                "type": "singlechoice",
+                "options": [
+                    "Guten Morgen",
+                    "Gute Nacht",
+                    "Hallo"
+                ],
+                "solution": "Guten Morgen"
+            }
+        ]
+    }
+]

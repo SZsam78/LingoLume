@@ -8,6 +8,8 @@ import { DiagnosticsPanel } from './components/DiagnosticsPanel';
 import { Artikeltrainer } from './features/learning/Artikeltrainer';
 import { AdminDashboard } from './features/admin/AdminDashboard';
 import { StoryMode } from './features/story/StoryMode';
+import { Login } from './features/auth/Login';
+import { AuthService, User } from './lib/auth';
 
 type ViewState =
     | { type: 'modules' }
@@ -19,8 +21,19 @@ type ViewState =
     | { type: 'settings' };
 
 function App() {
+    const [user, setUser] = useState<User | null>(AuthService.getCurrentUser());
     const [view, setView] = useState<ViewState>({ type: 'modules' });
     const [history, setHistory] = useState<ViewState[]>([]);
+
+    useEffect(() => {
+        if (user?.role === 'user' && view.type === 'admin') {
+            setView({ type: 'modules' });
+        }
+    }, [view, user]);
+
+    if (!user) {
+        return <Login onLogin={setUser} />;
+    }
 
     const navigateTo = (nextView: ViewState) => {
         if (sessionStorage.getItem('unsaved_changes') === 'true') {
@@ -76,6 +89,7 @@ function App() {
             <Sidebar
                 activeView={view.type}
                 onNavigate={(id) => navigateTo({ type: id as any })}
+                userRole={user.role}
             />
 
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -84,6 +98,8 @@ function App() {
                     onBack={handleBack}
                     canBack={history.length > 0}
                     onHome={() => setView({ type: 'modules' })}
+                    user={user}
+                    onLogout={() => AuthService.logout()}
                 />
 
                 <main className="flex-1 overflow-auto bg-slate-50/50">

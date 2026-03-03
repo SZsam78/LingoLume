@@ -1,5 +1,6 @@
-import { ChevronLeft, Home, ChevronRight } from 'lucide-react';
+import { ChevronLeft, Home, ChevronRight, LogOut, User as UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { User } from '@/lib/auth';
 
 interface Breadcrumb {
     label: string;
@@ -11,9 +12,11 @@ interface HeaderProps {
     onBack: () => void;
     canBack: boolean;
     onHome: () => void;
+    user: User;
+    onLogout: () => void;
 }
 
-export function Header({ breadcrumbs, onBack, canBack, onHome }: HeaderProps) {
+export function Header({ breadcrumbs, onBack, canBack, onHome, user, onLogout }: HeaderProps) {
     return (
         <header className="h-16 border-b bg-card px-6 flex items-center justify-between sticky top-0 z-40 backdrop-blur-md bg-card/80">
             <div className="flex items-center gap-6">
@@ -57,10 +60,20 @@ export function Header({ breadcrumbs, onBack, canBack, onHome }: HeaderProps) {
             </div>
 
             <div className="flex items-center gap-4">
-                <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white font-black text-xs">
-                    LL
+                <div className="flex flex-col items-end mr-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#1A1A1A]">{user.name}</span>
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase">{user.role}</span>
                 </div>
-                <span className="font-bold text-sm hidden sm:inline">LingoLume</span>
+                <div className="h-10 w-10 bg-slate-100 rounded-xl flex items-center justify-center text-primary border shadow-sm">
+                    <UserIcon className="h-5 w-5" />
+                </div>
+                <button
+                    onClick={onLogout}
+                    className="p-2 ml-2 h-10 w-10 bg-slate-100 rounded-xl border flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-500 transition-all shadow-sm"
+                    title="Abmelden"
+                >
+                    <LogOut className="h-5 w-5" />
+                </button>
             </div>
         </header>
     );

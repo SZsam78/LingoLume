@@ -3,15 +3,16 @@ import { cn } from '@/lib/utils';
 
 interface SidebarProps {
     activeView: string;
-    onNavigate: (view: string) => void;
+    onNavigate: (id: string) => void;
+    userRole?: 'admin' | 'user';
 }
 
-export function Sidebar({ activeView, onNavigate }: SidebarProps) {
+export function Sidebar({ activeView, onNavigate, userRole = 'user' }: SidebarProps) {
     const items = [
         { id: 'modules', label: 'Lernplan', icon: LayoutGrid },
         { id: 'artikel', label: 'Artikeltrainer', icon: GraduationCap },
         { id: 'story', label: 'Story-Modus', icon: PlaySquare },
-        { id: 'admin', label: 'Admin-Bereich', icon: ShieldCheck },
+        ...(userRole === 'admin' ? [{ id: 'admin', label: 'Admin-Bereich', icon: ShieldCheck }] : []),
         { id: 'settings', label: 'Einstellungen', icon: Settings },
     ];
 
