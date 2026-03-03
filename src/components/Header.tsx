@@ -27,7 +27,16 @@ export function Header({ breadcrumbs, onBack, canBack, onHome, user, onLogout }:
         { code: 'en', label: 'English', flag: '🇺🇸' },
         { code: 'fr', label: 'Français', flag: '🇫🇷' },
         { code: 'es', label: 'Español', flag: '🇪🇸' },
+        { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+        { code: 'uk', label: 'Українська', flag: '🇺🇦' },
+        { code: 'ja', label: '日本語', flag: '🇯🇵' },
+        { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
     ];
+
+    useEffect(() => {
+        document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = language;
+    }, [language]);
     return (
         <header className="h-16 border-b bg-card px-6 flex items-center justify-between sticky top-0 z-40 backdrop-blur-md bg-card/80">
             <div className="flex items-center gap-6">
