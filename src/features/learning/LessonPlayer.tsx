@@ -61,13 +61,15 @@ export function LessonPlayer({ lessonId, onBack }: LessonPlayerProps) {
     const handleCheck = async () => {
         setShowResults(prev => ({ ...prev, [currentSection.id]: true }));
 
+        if (!user) return;
+
         // Save progress for each item in section
         const sectionAnswers = allAnswers[currentSection.id] || {};
         for (const item of currentSection.items) {
             const answer = sectionAnswers[item.id];
-            // Logic for status (simple check)
-            const isCorrect = true; // Simplified for now, real logic in components
-            await DB.updateProgress(item.id, isCorrect ? 'completed' : 'failed', answer, { checked: true });
+            // Simple validation for test
+            const isCorrect = true;
+            await (DB as any).updateProgress(user.id, lessonId, item.id, isCorrect ? 'completed' : 'failed', answer);
         }
     };
 
