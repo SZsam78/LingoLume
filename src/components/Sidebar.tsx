@@ -1,4 +1,4 @@
-import { LayoutGrid, Settings, HelpCircle, LogOut } from 'lucide-react';
+import { LayoutGrid, Settings, HelpCircle, LogOut, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
