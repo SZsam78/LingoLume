@@ -198,10 +198,27 @@ export function UserList() {
                                     </div>
 
                                     <div className="flex items-center justify-between pt-4 border-t border-dashed">
-                                        <button className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors">
+                                        <button
+                                            onClick={async () => {
+                                                if (window.confirm(`${user.name} wirklich löschen?`)) {
+                                                    await DB.deleteUser(user.id);
+                                                    setUsers(users.filter(u => u.id !== user.id));
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors"
+                                        >
                                             <Trash2 className="h-3.5 w-3.5" /> {t('benutzer_loeschen')}
                                         </button>
-                                        <button className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] text-white rounded-xl text-xs font-bold">
+                                        <button
+                                            onClick={async () => {
+                                                const newPass = window.prompt("Neues Passwort vergeben:", "0000");
+                                                if (newPass) {
+                                                    await updateDoc(doc(firestore, 'users', user.id), { password: newPass });
+                                                    alert("Passwort wurde geändert.");
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 px-4 py-2 bg-[#1A1A1A] text-white rounded-xl text-xs font-bold"
+                                        >
                                             <Lock className="h-3.5 w-3.5" /> {t('passwort_zuruecksetzen')}
                                         </button>
                                     </div>

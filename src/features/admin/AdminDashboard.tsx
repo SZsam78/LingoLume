@@ -98,27 +98,51 @@ export function AdminDashboard() {
                                         className="flex-1 min-h-[150px] bg-white border rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-primary/20 outline-none"
                                     />
                                     <button
+                                        onClick={async () => {
+                                            setIsProcessing(true);
+                                            try {
+                                                const data = JSON.parse(jsonInput);
+                                                const items = Array.isArray(data) ? data : [data];
+                                                for (const l of items) await DB.saveLesson(l);
+                                                alert(`${items.length} Lektion(en) erfolgreich importiert.`);
+                                                setJsonInput('');
+                                            } catch (err: any) { alert("Import Fehler: " + err.message); }
+                                            finally { setIsProcessing(false); }
+                                        }}
                                         disabled={!jsonInput || isProcessing}
                                         className="bg-[#1A1A1A] text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 disabled:opacity-30"
                                     >
                                         Validieren & Speichern
                                     </button>
 
-                                    <button
-                                        onClick={async () => {
-                                            setIsProcessing(true);
-                                            try {
-                                                const res = await fetch('/test_upload.json');
-                                                const data = await res.json();
-                                                for (const l of data) await DB.saveLesson(l);
-                                                alert("Test-Lektion erfolgreich hochgeladen! Diese ist jetzt unter A1.1 im Lernplan sichtbar.");
-                                            } catch (err) { alert("Upload Fehler"); }
-                                            finally { setIsProcessing(false); }
-                                        }}
-                                        className="mt-4 w-full border-2 border-primary/20 text-primary py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary/5 transition-all"
-                                    >
-                                        VERIFIZIERUNGS-TEST: TESTLEKTION LADEN
-                                    </button>
+                                    <div className="flex flex-col gap-2 mt-2">
+                                        <button
+                                            onClick={async () => {
+                                                setIsProcessing(true);
+                                                try {
+                                                    const res = await fetch('/test_upload.json');
+                                                    const data = await res.json();
+                                                    for (const l of data) await DB.saveLesson(l);
+                                                    alert("Test-Lektion erfolgreich hochgeladen! Diese ist jetzt unter A1.1 im Lernplan sichtbar.");
+                                                } catch (err) { alert("Upload Fehler"); }
+                                                finally { setIsProcessing(false); }
+                                            }}
+                                            className="w-full border-2 border-primary/20 text-primary py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary/5 transition-all"
+                                        >
+                                            VERIFIZIERUNGS-TEST: TESTLEKTION LADEN
+                                        </button>
+
+                                        <button
+                                            onClick={async () => {
+                                                const { VocabularyDB } = await import('@/lib/vocabularyDb');
+                                                await VocabularyDB.prefillDefaultData();
+                                                alert("Vokabel-Datenbank mit A1.1 Beispiel-Wörtern gefüllt!");
+                                            }}
+                                            className="w-full border-2 border-teal-500/20 text-teal-600 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-teal-50 transition-all"
+                                        >
+                                            ARTIKELTRAINER: START-DATEN LADEN
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +153,19 @@ export function AdminDashboard() {
                                     <h3 className="font-black text-lg">Datenbank Wartung</h3>
                                     <p className="text-xs text-muted-foreground">Vorsicht: Diese Aktionen löschen Daten permanent.</p>
                                 </div>
-                                <button className="flex items-center gap-2 px-4 py-2 text-white bg-red-500 rounded-xl font-bold text-sm hover:bg-red-600 transition-colors">
+                                <button
+                                    onClick={async () => {
+                                        if (window.confirm("Wirklich ALLE Lektionen aus Firestore löschen?")) {
+                                            setIsProcessing(true);
+                                            try {
+                                                await DB.clearLessons();
+                                                alert("Alle Lektionen wurden gelöscht.");
+                                            } catch (err) { alert("Fehler beim Löschen"); }
+                                            finally { setIsProcessing(false); }
+                                        }
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 text-white bg-red-500 rounded-xl font-bold text-sm hover:bg-red-600 transition-colors"
+                                >
                                     <Trash2 className="h-4 w-4" /> Lektionen leeren
                                 </button>
                             </div>

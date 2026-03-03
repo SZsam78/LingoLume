@@ -59,44 +59,47 @@ export class DB {
     }
 
     static async saveLesson(lesson: any) {
+        const id = lesson.id || `${lesson.moduleId}-L${String(lesson.order || 1).padStart(2, '0')}`;
         const updatedAt = new Date().toISOString();
         if (!window.electronAPI) {
-            await setDoc(doc(firestore, 'lessons', lesson.id), {
+            await setDoc(doc(firestore, 'lessons', id), {
                 ...lesson,
+                id,
                 updatedAt
             });
             return;
         }
 
-        const existing = await this.getLesson(lesson.id);
+        const existing = await this.getLesson(id);
         if (existing) {
             return this.execute(
                 'UPDATE lessons SET title = ?, content_json = ?, isPublished = ?, updatedAt = ? WHERE id = ?',
-                [lesson.title, JSON.stringify(lesson), lesson.isPublished ? 1 : 0, updatedAt, lesson.id]
+                [lesson.title, JSON.stringify(lesson), lesson.isPublished ? 1 : 0, updatedAt, id]
             );
         } else {
             return this.execute(
                 'INSERT INTO lessons (id, moduleId, title, content_json, isPublished, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
-                [lesson.id, lesson.moduleId, lesson.title, JSON.stringify(lesson), 0, updatedAt]
+                [id, lesson.moduleId, lesson.title, JSON.stringify(lesson), 0, updatedAt]
             );
         }
     }
 
-    static async uploadMedia(file: File): Promise<any> {
-        const id = crypto.randomUUID();
-        const updatedAt = new Date().toISOString();
-        const extension = file.name.split('.').pop();
-        const fileName = `${id}.${extension}`;
-
-        const arrayBuffer = await file.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-
-        if (window.electronAPI) {
-            const result = await window.electronAPI.saveMedia(fileName, uint8Array);
-            return { id, fileName, path: result.path };
+    static async clearLessons() {
+        if (!window.electronAPI) {
+            const { writeBatch, getDocs, collection } = await import('firebase/firestore');
+            const batch = writeBatch(firestore);
+            const snapshot = await getDocs(collection(firestore, 'lessons'));
+            snapshot.forEach((d) => batch.delete(d.ref));
+            await batch.commit();
+            return;
         }
+        return this.execute('DELETE FROM lessons');
+    }
 
-        // No web media upload implemented yet, just return dummy/local info
-        return { id, fileName, path: URL.createObjectURL(file), updatedAt };
+    static async deleteUser(uid: string) {
+        if (!window.electronAPI) {
+            const { deleteDoc, doc } = await import('firebase/firestore');
+            await deleteDoc(doc(firestore, 'users', uid));
+        }
     }
 }
