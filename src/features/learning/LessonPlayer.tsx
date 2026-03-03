@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, CheckCircle, RotateCcw, Lightbulb } from 'lucide-react';
 import { TaskRenderer } from './TaskRenderer';
 import { DB } from '@/lib/db';
+import { AuthService } from '@/lib/auth';
 
 interface LessonPlayerProps {
     lessonId: string;
@@ -11,6 +12,7 @@ interface LessonPlayerProps {
 }
 
 export function LessonPlayer({ lessonId, onBack }: LessonPlayerProps) {
+    const user = AuthService.getCurrentUser();
     const [lesson, setLesson] = useState<Lesson | null>(null);
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [loading, setLoading] = useState(true);

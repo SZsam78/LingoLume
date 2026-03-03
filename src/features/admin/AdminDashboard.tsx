@@ -101,6 +101,22 @@ export function AdminDashboard() {
                                     >
                                         Validieren & Speichern
                                     </button>
+
+                                    <button
+                                        onClick={async () => {
+                                            setIsProcessing(true);
+                                            try {
+                                                const res = await fetch('/test_upload.json');
+                                                const data = await res.json();
+                                                for (const l of data) await DB.saveLesson(l);
+                                                alert("Test-Lektion erfolgreich hochgeladen! Diese ist jetzt unter A1.1 im Lernplan sichtbar.");
+                                            } catch (err) { alert("Upload Fehler"); }
+                                            finally { setIsProcessing(false); }
+                                        }}
+                                        className="mt-4 w-full border-2 border-primary/20 text-primary py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary/5 transition-all"
+                                    >
+                                        VERIFIZIERUNGS-TEST: TESTLEKTION LADEN
+                                    </button>
                                 </div>
                             </div>
                         </div>
