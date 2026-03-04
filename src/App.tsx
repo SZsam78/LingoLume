@@ -172,20 +172,20 @@ function App() {
 
                     {view.type === 'vokabeltrainer' && (
                         <div className="p-8 text-center mt-20">
-                            <h2 className="text-3xl font-black mb-4">Vokabeltrainer</h2>
-                            <p className="text-muted-foreground">Vertiefe deinen Wortschatz mit interaktiven Übungen. Demnächst verfügbar!</p>
+                            <h2 className="text-3xl font-black mb-4">{t('vokabeltrainer')}</h2>
+                            <p className="text-muted-foreground">{t('vokabeltrainer_beschreibung')}</p>
                         </div>
                     )}
                     {view.type === 'media' && (
                         <div className="p-8 text-center mt-20">
-                            <h2 className="text-3xl font-black mb-4">Medienbibliothek</h2>
-                            <p className="text-muted-foreground">Hier findest du bald alle deine heruntergeladenen Audio- und Videodateien.</p>
+                            <h2 className="text-3xl font-black mb-4">{t('medien')}</h2>
+                            <p className="text-muted-foreground">{t('medien_beschreibung')}</p>
                         </div>
                     )}
                     {view.type === 'tools' && (
                         <div className="p-8 text-center mt-20">
-                            <h2 className="text-3xl font-black mb-4">Lern-Werkzeuge</h2>
-                            <p className="text-muted-foreground">Wörterbücher, Grammatiktabellen und praktische Tools in Kürze verfügbar.</p>
+                            <h2 className="text-3xl font-black mb-4">{t('werkzeuge')}</h2>
+                            <p className="text-muted-foreground">{t('werkzeuge_beschreibung')}</p>
                         </div>
                     )}
                     {view.type === 'settings' && <div className="p-8">Einstellungen (Coming Soon)</div>}

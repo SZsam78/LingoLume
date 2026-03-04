@@ -31,6 +31,9 @@ const translations = {
         fehler_laden: 'Lektion nicht gefunden.',
         verwaltung_beschreibung: 'Verwalte Lektionen, Benutzer & Story-Inhalte.',
         rechte_matrix: 'Berechtigungen (Rechte-Matrix)',
+        medien_beschreibung: 'Hier findest du bald alle deine heruntergeladenen Audio- und Videodateien.',
+        werkzeuge_beschreibung: 'Wörterbücher, Grammatiktabellen und praktische Tools in Kürze verfügbar.',
+        vokabeltrainer_beschreibung: 'Vertiefe deinen Wortschatz mit interaktiven Übungen. Demnächst verfügbar!',
     },
     en: {
         lernplan: 'Learning Plan',
@@ -60,6 +63,9 @@ const translations = {
         fehler_laden: 'Lesson not found.',
         verwaltung_beschreibung: 'Manage lessons, users & story content.',
         rechte_matrix: 'Permissions (Rights Matrix)',
+        medien_beschreibung: 'All your downloaded audio and video files will be available here soon.',
+        werkzeuge_beschreibung: 'Dictionaries, grammar tables, and practical tools coming soon.',
+        vokabeltrainer_beschreibung: 'Deepen your vocabulary with interactive exercises. Coming soon!',
     },
     fr: {
         lernplan: 'Plan d\'apprentissage',
@@ -89,6 +95,9 @@ const translations = {
         fehler_laden: 'Leçon non trouvée.',
         verwaltung_beschreibung: 'Gérez les leçons, les utilisateurs et le contenu de l\'histoire.',
         rechte_matrix: 'Autorisations (Matrice des droits)',
+        medien_beschreibung: 'Tous vos fichiers audio et vidéo téléchargés seront bientôt disponibles ici.',
+        werkzeuge_beschreibung: 'Dictionnaires, tableaux de grammaire et outils pratiques bientôt disponibles.',
+        vokabeltrainer_beschreibung: 'Approfondissez votre vocabulaire avec des exercices interactifs. Bientôt disponible !',
     },
     es: {
         lernplan: 'Plan de aprendizaje',
@@ -118,6 +127,9 @@ const translations = {
         fehler_laden: 'Lección no encontrada.',
         verwaltung_beschreibung: 'Administre lecciones, usuarios y contenido de historias.',
         rechte_matrix: 'Permisos (Matriz de derechos)',
+        medien_beschreibung: 'Todos tus archivos de audio y video descargados estarán disponibles aquí pronto.',
+        werkzeuge_beschreibung: 'Diccionarios, tablas de gramática y herramientas prácticas próximamente.',
+        vokabeltrainer_beschreibung: 'Profundiza tu vocabulario con ejercicios interactivos. ¡Próximamente!',
     },
     ar: {
         lernplan: 'خطة التعلم',
@@ -147,6 +159,9 @@ const translations = {
         fehler_laden: 'لم يتم العثور على الدرس.',
         verwaltung_beschreibung: 'إدارة الدروس والمستخدمين ومحتوى القصة.',
         rechte_matrix: 'الأذونات (مصفوفة الحقوق)',
+        medien_beschreibung: 'ستتوفر جميع ملفات الصوت والفيديو المحملة هنا قريبًا.',
+        werkzeuge_beschreibung: 'القواميس وجداول القواعد والأدوات العملية ستتوفر قريبًا.',
+        vokabeltrainer_beschreibung: 'عزز مفرداتك بتمارين تفاعلية. قريباً!',
     },
     uk: {
         lernplan: 'План навчання',
@@ -176,6 +191,9 @@ const translations = {
         fehler_laden: 'Урок не знайдено.',
         verwaltung_beschreibung: 'Керуйте уроками, користувачами та контентом історії.',
         rechte_matrix: 'Дозволи (Матриця прав)',
+        medien_beschreibung: 'Усі завантажені аудіо- та відеофайли будуть доступні тут незабаром.',
+        werkzeuge_beschreibung: 'Словники, граматичні таблиці та практичні інструменти незабаром.',
+        vokabeltrainer_beschreibung: 'Поглиблюйте свій словниковий запас за допомогою інтерактивних вправ. Незабаром!',
     },
     ja: {
         lernplan: '学習プラン',
@@ -205,6 +223,9 @@ const translations = {
         fehler_laden: 'レッスンが見つかりません。',
         verwaltung_beschreibung: 'レッスン、ユーザー、ストーリーコンテンツを管理します。',
         rechte_matrix: '権限（権限マトリックス）',
+        medien_beschreibung: 'ダウンロードしたすべてのオーディオファイルとビデオファイルがまもなくここで利用可能になります。',
+        werkzeuge_beschreibung: '辞書、文法表、実用的なツールがまもなく登場します。',
+        vokabeltrainer_beschreibung: 'インタラクティブな演習で語彙を深めます。まもなく登場！',
     },
     hi: {
         lernplan: 'सीखने की योजना',
@@ -234,6 +255,9 @@ const translations = {
         fehler_laden: 'पाठ नहीं मिला।',
         verwaltung_beschreibung: 'पाठ, उपयोगकर्ता और कहानी सामग्री प्रबंधित करें।',
         rechte_matrix: 'अनुमतियां (अधिकार मैट्रिक्स)',
+        medien_beschreibung: 'आपकी सभी डाउनलोड की गई ऑडियो और वीडियो फ़ाइलें जल्द ही यहां उपलब्ध होंगी।',
+        werkzeuge_beschreibung: 'शब्दकोश, व्याकरण तालिकाएँ और व्यावहारिक उपकरण जल्द ही आ रहे हैं।',
+        vokabeltrainer_beschreibung: 'इंटरैक्टिव अभ्यासों के साथ अपनी शब्दावली को गहरा करें। जल्द ही आ रहा है!',
     }
 };
 
