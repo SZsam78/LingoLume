@@ -113,7 +113,7 @@ function App() {
     };
 
     return (
-        <div className="flex h-screen bg-background text-foreground overflow-hidden relative">
+        <div className="flex h-[100dvh] bg-background text-foreground overflow-hidden relative overflow-x-hidden">
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div

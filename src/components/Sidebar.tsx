@@ -69,27 +69,7 @@ export function Sidebar({ activeView, onNavigate, user }: SidebarProps) {
                 })}
             </nav>
 
-            <div className="p-6 space-y-4">
-                <div className="bg-[#F0EEE6] p-5 rounded-[2rem] border border-[#E6E2D6] relative overflow-hidden group">
-                    <div className="relative z-10">
-                        <div className="text-[10px] font-bold text-primary/70 uppercase tracking-widest mb-3">Community</div>
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-md">
-                                <span className="text-lg">👋</span>
-                            </div>
-                            <div>
-                                <div className="text-xs font-black text-[#1A1A1A]">Helfe anderen!</div>
-                                <div className="text-[10px] text-muted-foreground font-bold">Werde Mentor</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <button className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-muted-foreground hover:bg-[#F0EEE6] transition-all font-bold text-sm">
-                    <LogOut className="h-5 w-5" />
-                    {t('abmelden')}
-                </button>
-            </div>
         </aside>
     );
 }
